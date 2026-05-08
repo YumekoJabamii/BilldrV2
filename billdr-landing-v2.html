@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>billdr — Automatizamos tu facturación, cobro y conciliación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000000;
+    --bg-2: #060606;
+    --bg-3: #0c0c0c;
+    --bg-card: #0a0a0a;
+    --line: #161616;
+    --line-2: #1f1f1f;
+    --line-3: #2a2a2a;
+    --text: #ffffff;
+    --text-dim: #8a8a8a;
+    --text-muted: #555555;
+    --accent: #2D5BFF;
+    --accent-bright: #4070ff;
+    --accent-soft: rgba(45, 91, 255, 0.12);
+    --accent-glow: rgba(45, 91, 255, 0.25);
+    --accent-line: rgba(45, 91, 255, 0.4);
+    --warn: #ff5c5c;
+    --success: #4ade80;
+    --display: 'Inter', system-ui, sans-serif;
+    --body: 'Inter', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: -1px -1px;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--text);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ─────────── NAV ─────────── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 18px 32px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+    font-weight: 500;
+  }
+
+  .nav-links a:hover {
+    color: var(--text);
+  }
+
+  .nav-cta {
+    background: var(--accent);
+    color: var(--text) !important;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .nav-cta:hover {
+    background: var(--accent-bright);
+    transform: translateY(-1px);
+  }
+
+  /* ─────────── HERO ─────────── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 0 80px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 600px;
+    background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 60%);
+    filter: blur(40px);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    padding: 0 32px;
+    width: 100%;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--display);
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    letter-spacing: 0.25em;
+    font-weight: 500;
+    text-transform: uppercase;
+    animation: fadeUp 0.8s ease-out;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(40px, 6.5vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin-bottom: 32px;
+    animation: fadeUp 1s ease-out 0.1s both;
+  }
+
+  .hero h1 .accent {
+    color: var(--accent);
+  }
+
+  .hero-divider {
+    width: 40px;
+    height: 2px;
+    background: var(--accent);
+    margin: 0 auto 24px;
+    animation: fadeUp 1s ease-out 0.2s both;
+  }
+
+  .hero-status {
+    font-family: var(--display);
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    animation: fadeUp 1s ease-out 0.3s both;
+  }
+
+  .hero-status::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.3); }
+  }
+
+  .hero-chips {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 56px;
+    animation: fadeUp 1s ease-out 0.4s both;
+  }
+
+  .chip {
+    font-family: var(--display);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 8px 16px;
+    border: 1px solid var(--line-3);
+    border-radius: 100px;
+    background: rgba(255,255,255,0.02);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .chip:hover {
+    border-color: var(--accent-line);
+    color: var(--text);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 1s ease-out 0.5s both;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--text);
+    padding: 14px 26px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.3s;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 0 24px var(--accent-glow);
+  }
+
+  .btn-secondary {
+    color: var(--text);
+    padding: 14px 26px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    border: 1px solid var(--line-3);
+    background: rgba(255,255,255,0.02);
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--text-dim);
+    background: rgba(255,255,255,0.05);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─────────── SECCIONES ─────────── */
+  section {
+    padding: 120px 0;
+    position: relative;
+  }
+
+  .section-eyebrow {
+    font-family: var(--display);
+    font-size: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(32px, 4.5vw, 56px);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    margin-bottom: 24px;
+  }
+
+  h2 .accent {
+    color: var(--accent);
+  }
+
+  h2 .dim {
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .section-lead {
+    font-size: 19px;
+    color: var(--text-dim);
+    max-width: 640px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* ─────────── PROBLEMA ─────────── */
+  .problem {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg-2);
+  }
+
+  .problem-quote {
+    max-width: 880px;
+    margin: 56px 0;
+    padding: 36px 40px;
+    border-left: 2px solid var(--accent);
+    background: linear-gradient(90deg, var(--accent-soft) 0%, transparent 100%);
+  }
+
+  .problem-quote p {
+    font-family: var(--display);
+    font-size: clamp(20px, 2.2vw, 26px);
+    line-height: 1.4;
+    color: var(--text);
+    margin-bottom: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .problem-quote cite {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: normal;
+    letter-spacing: 0.05em;
+  }
+
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: 60px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .problem-card {
+    background: var(--bg-2);
+    padding: 36px 32px;
+    transition: background 0.3s;
+  }
+
+  .problem-card:hover {
+    background: var(--bg-3);
+  }
+
+  .problem-num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .problem-card h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .problem-card p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ─────────── SOLUCIÓN ─────────── */
+  .solution-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 80px;
+  }
+
+  .solution-flow {
+    position: sticky;
+    top: 100px;
+  }
+
+  .flow-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 12px;
+    position: relative;
+    transition: transform 0.3s, border-color 0.3s, background 0.3s;
+  }
+
+  .flow-card:hover {
+    transform: translateX(8px);
+    border-color: var(--accent-line);
+    background: var(--bg-3);
+  }
+
+  .flow-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .flow-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--accent-line);
+  }
+
+  .flow-card h4 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+
+  .flow-card p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+    padding-left: 56px;
+  }
+
+  .solution-text h2 {
+    margin-bottom: 32px;
+  }
+
+  .solution-text p {
+    color: var(--text-dim);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  /* ─────────── DASHBOARD MOCK ─────────── */
+  .dashboard-section {
+    background: var(--bg-2);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .dashboard-mock {
+    margin-top: 64px;
+    background: var(--bg);
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8), 0 0 60px var(--accent-soft);
+    position: relative;
+  }
+
+  .dashboard-mock::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 25%;
+    right: 25%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .dashboard-bar {
+    background: var(--bg-2);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dashboard-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--line-3);
+  }
+
+  .dashboard-url {
+    margin-left: 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 5px 12px;
+    border-radius: 4px;
+    flex: 1;
+    max-width: 300px;
+    border: 1px solid var(--line);
+  }
+
+  .dashboard-body {
+    padding: 28px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 28px;
+    min-height: 480px;
+  }
+
+  .dashboard-sidebar {
+    border-right: 1px solid var(--line);
+    padding-right: 20px;
+  }
+
+  .sidebar-section {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+    margin-top: 24px;
+  }
+
+  .sidebar-item {
+    padding: 9px 12px;
+    font-size: 13px;
+    color: var(--text-dim);
+    border-radius: 6px;
+    cursor: default;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 500;
+  }
+
+  .sidebar-item.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .sidebar-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--line-2);
+  }
+
+  .dashboard-main h5 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .stat-box {
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    padding: 16px;
+    background: var(--bg-2);
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+
+  .stat-trend {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--success);
+    letter-spacing: 0.02em;
+  }
+
+  .stat-trend.warn {
+    color: var(--warn);
+  }
+
+  .invoice-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 90px 110px 90px;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    align-items: center;
+  }
+
+  .invoice-row.header {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .invoice-num {
+    font-family: var(--mono);
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  .invoice-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-align: center;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .invoice-status.paid {
+    background: rgba(74, 222, 128, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+  }
+
+  .invoice-status.pending {
+    background: rgba(255, 165, 0, 0.1);
+    color: orange;
+    border: 1px solid rgba(255, 165, 0, 0.2);
+  }
+
+  .invoice-status.overdue {
+    background: rgba(255, 92, 92, 0.1);
+    color: var(--warn);
+    border: 1px solid rgba(255, 92, 92, 0.2);
+  }
+
+  /* ─────────── FEATURES ─────────── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .feature {
+    background: var(--bg);
+    padding: 36px 28px;
+    transition: background 0.3s;
+  }
+
+  .feature:hover {
+    background: var(--bg-2);
+  }
+
+  .feature-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 1px solid var(--accent-line);
+    font-weight: 600;
+  }
+
+  .feature-tag.v2 {
+    color: var(--text-muted);
+    background: var(--bg-3);
+    border-color: var(--line-3);
+  }
+
+  .feature h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 19px;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .feature p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ─────────── PERSONAS ─────────── */
+  .personas {
+    background: var(--bg-2);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .personas-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 64px;
+  }
+
+  .persona {
+    background: var(--bg);
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    padding: 36px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .persona:hover {
+    border-color: var(--accent-line);
+    transform: translateY(-4px);
+  }
+
+  .persona-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .persona-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #1a3fcc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    border: 1px solid var(--accent-line);
+  }
+
+  .persona-name {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .persona-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .persona-quote {
+    font-family: var(--display);
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--text);
+    padding: 16px 0;
+    font-weight: 400;
+  }
+
+  .persona-quote::before {
+    content: '"';
+    color: var(--accent);
+    font-size: 32px;
+    line-height: 0;
+    position: relative;
+    top: 12px;
+    margin-right: 4px;
+  }
+
+  .persona-context {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ─────────── PRICING ─────────── */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 80px;
+  }
+
+  .price-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    padding: 36px 28px;
+    position: relative;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+
+  .price-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--line-3);
+  }
+
+  .price-card.featured {
+    background: linear-gradient(180deg, var(--accent-soft) 0%, var(--bg-card) 60%);
+    border-color: var(--accent);
+  }
+
+  .price-card.featured::before {
+    content: 'Más elegido';
+    position: absolute;
+    top: -10px;
+    left: 28px;
+    background: var(--accent);
+    color: var(--text);
+    font-family: var(--display);
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+
+  .price-name {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .price-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  .price-amount {
+    font-family: var(--display);
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+
+  .price-amount span {
+    font-size: 16px;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .price-period {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .price-features {
+    list-style: none;
+    margin-bottom: 28px;
+  }
+
+  .price-features li {
+    padding: 9px 0;
+    font-size: 13px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .price-features li::before {
+    content: '→';
+    color: var(--accent);
+    font-family: var(--mono);
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  .price-cta {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    background: var(--bg);
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid var(--line-3);
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .price-card.featured .price-cta {
+    background: var(--accent);
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .price-cta:hover {
+    transform: translateY(-1px);
+    background: var(--accent-bright);
+    border-color: var(--accent-bright);
+  }
+
+  .price-card:not(.featured) .price-cta:hover {
+    background: var(--bg-2);
+    border-color: var(--text-dim);
+  }
+
+  /* ─────────── CTA FINAL ─────────── */
+  .cta-final {
+    text-align: center;
+    padding: 140px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-final::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cta-final h2 {
+    font-size: clamp(40px, 6vw, 72px);
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .cta-final p {
+    color: var(--text-dim);
+    font-size: 18px;
+    margin-bottom: 40px;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+
+  .cta-final-actions {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ─────────── FOOTER ─────────── */
+  footer {
+    background: var(--bg-2);
+    padding: 60px 0 32px;
+    border-top: 1px solid var(--line);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 48px;
+  }
+
+  .footer-brand .logo {
+    font-size: 24px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .footer-brand p {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.6;
+    max-width: 320px;
+  }
+
+  .footer-col h6 {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+
+  .footer-col a {
+    display: block;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 5px 0;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover {
+    color: var(--text);
+  }
+
+  .footer-bottom {
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ─────────── RESPONSIVE ─────────── */
+  @media (max-width: 900px) {
+    .container { padding: 0 24px; }
+    .nav-links { gap: 16px; }
+    .nav-links a:not(.nav-cta) { display: none; }
+    .hero { padding: 100px 0 60px; }
+    .solution-grid { grid-template-columns: 1fr; gap: 48px; }
+    .solution-flow { position: static; }
+    .features-grid { grid-template-columns: 1fr; }
+    .problems-grid { grid-template-columns: 1fr; }
+    .personas-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .dashboard-body { grid-template-columns: 1fr; }
+    .dashboard-sidebar { display: none; }
+    .invoice-row { grid-template-columns: 1fr 80px; gap: 8px; }
+    .invoice-row > *:nth-child(1),
+    .invoice-row > *:nth-child(3),
+    .invoice-row > *:nth-child(4) { display: none; }
+    section { padding: 80px 0; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">billdr</div>
+    <div class="nav-links">
+      <a href="#producto">Producto</a>
+      <a href="#features">Funcionalidades</a>
+      <a href="#precios">Precios</a>
+      <a href="#contacto" class="nav-cta">Empezar</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─────────── HERO ─────────── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">BILLDR</div>
+    <h1>Automatizamos tu<br><span class="accent">facturación, cobro</span><br>y conciliación</h1>
+    <div class="hero-divider"></div>
+
+    <div class="hero-chips">
+      <span class="chip">Facturación recurrente</span>
+      <span class="chip">Cobro automático</span>
+      <span class="chip">Conciliación</span>
+    </div>
+
+    <div class="hero-cta">
+      <a href="#contacto" class="btn-primary">Sumate a la lista de espera →</a>
+      <a href="#producto" class="btn-secondary">Ver cómo funciona</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── PROBLEMA ─────────── -->
+<section class="problem" id="problema">
+  <div class="container">
+    <div class="section-eyebrow">El problema</div>
+    <h2>Cada mes, <span class="dim">el mismo ritual.</span></h2>
+
+    <div class="problem-quote">
+      <p>"Facturar a mano, conciliar contra el banco, cazar a quien no pagó y esperar que ARCA no esté caída."</p>
+      <cite>— Cualquier empresa de servicios con abonos en Argentina</cite>
+    </div>
+
+    <div class="problems-grid">
+      <div class="problem-card">
+        <div class="problem-num">01</div>
+        <h3>Facturación manual</h3>
+        <p>Planillas de Excel, copiar-pegar cada mes, errores de tipeo y comprobantes olvidados que aparecen días después.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">02</div>
+        <h3>ARCA impredecible</h3>
+        <p>Caídas del sistema en fechas clave. Sin reintentos automáticos, la factura simplemente no se emite.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">03</div>
+        <h3>Conciliación caótica</h3>
+        <p>Cruzar pagos con facturas lleva horas. Nunca se sabe con certeza qué se cobró, qué está parcial y qué no.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">04</div>
+        <h3>Cobranza reactiva</h3>
+        <p>El administrador recuerda quién debe cuando el problema ya es grande. Sin alertas, sin secuencias, sin orden.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">05</div>
+        <h3>Aumentos sin control</h3>
+        <p>En contexto inflacionario, actualizar precios manualmente significa siempre llegar tarde y perder margen.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">06</div>
+        <h3>Escala bloqueada</h3>
+        <p>Sumar clientes implica sumar horas en proporción lineal. El proceso manual no acompaña el crecimiento.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── SOLUCIÓN ─────────── -->
+<section id="producto">
+  <div class="container">
+    <div class="section-eyebrow">La solución</div>
+    <div class="solution-grid">
+      <div class="solution-text">
+        <h2>Una plataforma. <span class="accent">Un ciclo cerrado.</span></h2>
+        <p>
+          billdr no es otra herramienta de facturación electrónica más. Es la primera plataforma diseñada específicamente
+          para empresas con ingresos recurrentes en Argentina.
+        </p>
+        <p>
+          Desde que se emite el comprobante hasta que se confirma el cobro, todo sucede sin intervención manual.
+          Si ARCA se cae, billdr lo reintenta. Si un cliente no pagó, billdr lo recuerda. Si tenés que actualizar
+          precios, billdr los aplica con la regla que vos definís.
+        </p>
+        <p>
+          El resultado: el equipo deja de perseguir números y vuelve a hacer lo que sabe hacer.
+        </p>
+      </div>
+
+      <div class="solution-flow">
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="flow-icon">01</div>
+            <h4>Factura</h4>
+          </div>
+          <p>Emisión automática según calendario. Todos los tipos de comprobante. Cola inteligente ante caídas de ARCA.</p>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="flow-icon">02</div>
+            <h4>Actualiza</h4>
+          </div>
+          <p>Reglas de aumento por porcentaje, monto fijo o índice. Simulador de impacto previo a la aplicación.</p>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="flow-icon">03</div>
+            <h4>Concilia</h4>
+          </div>
+          <p>Registro de cobros, parciales, NC/ND. Vista facturado vs. cobrado en tiempo real, sin planillas.</p>
+        </div>
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="flow-icon">04</div>
+            <h4>Cobra</h4>
+          </div>
+          <p>Recordatorios por email y WhatsApp. Secuencias configurables. Aging de deuda y ranking de morosos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── DASHBOARD ─────────── -->
+<section class="dashboard-section">
+  <div class="container">
+    <div class="section-eyebrow">El producto</div>
+    <h2>Todo en una <span class="accent">sola pantalla.</span></h2>
+    <p class="section-lead">
+      Facturado, cobrado, pendiente y vencido en tiempo real. Sin exportar planillas, sin abrir cinco pestañas distintas.
+    </p>
+
+    <div class="dashboard-mock">
+      <div class="dashboard-bar">
+        <div class="dashboard-dot"></div>
+        <div class="dashboard-dot"></div>
+        <div class="dashboard-dot"></div>
+        <div class="dashboard-url">app.billdr.ar/dashboard</div>
+      </div>
+      <div class="dashboard-body">
+        <div class="dashboard-sidebar">
+          <div class="sidebar-section">Operación</div>
+          <div class="sidebar-item active">Dashboard</div>
+          <div class="sidebar-item">Facturación <span class="sidebar-badge">12</span></div>
+          <div class="sidebar-item">Conciliación</div>
+          <div class="sidebar-item">Cobranza <span class="sidebar-badge">3</span></div>
+          <div class="sidebar-section">Catálogo</div>
+          <div class="sidebar-item">Clientes</div>
+          <div class="sidebar-item">Productos</div>
+          <div class="sidebar-item">Reglas de precio</div>
+          <div class="sidebar-section">Sistema</div>
+          <div class="sidebar-item">ARCA</div>
+          <div class="sidebar-item">Equipo</div>
+        </div>
+        <div class="dashboard-main">
+          <h5>Resumen del mes</h5>
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-label">Facturado</div>
+              <div class="stat-value">$4.2M</div>
+              <div class="stat-trend">↑ 12% vs. mes anterior</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Cobrado</div>
+              <div class="stat-value">$3.8M</div>
+              <div class="stat-trend">90,4% del facturado</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Pendiente</div>
+              <div class="stat-value">$280K</div>
+              <div class="stat-trend">8 facturas</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Vencido</div>
+              <div class="stat-value">$120K</div>
+              <div class="stat-trend warn">3 facturas · revisar</div>
+            </div>
+          </div>
+
+          <div class="invoice-row header">
+            <div>Comprobante</div>
+            <div>Cliente</div>
+            <div>Vencimiento</div>
+            <div>Importe</div>
+            <div>Estado</div>
+          </div>
+          <div class="invoice-row">
+            <div class="invoice-num">A 0001-00342</div>
+            <div>Estudio López &amp; Asoc.</div>
+            <div>15 abr</div>
+            <div>$185.000</div>
+            <div class="invoice-status paid">Cobrada</div>
+          </div>
+          <div class="invoice-row">
+            <div class="invoice-num">A 0001-00341</div>
+            <div>Naranja Marketing SRL</div>
+            <div>15 abr</div>
+            <div>$340.000</div>
+            <div class="invoice-status paid">Cobrada</div>
+          </div>
+          <div class="invoice-row">
+            <div class="invoice-num">B 0001-00340</div>
+            <div>Centro Médico Belgrano</div>
+            <div>10 abr</div>
+            <div>$92.500</div>
+            <div class="invoice-status pending">Pendiente</div>
+          </div>
+          <div class="invoice-row">
+            <div class="invoice-num">A 0001-00339</div>
+            <div>Academia Rosario IT</div>
+            <div>05 abr</div>
+            <div>$120.000</div>
+            <div class="invoice-status overdue">Vencida</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── FEATURES ─────────── -->
+<section id="features">
+  <div class="container">
+    <div class="section-eyebrow">Funcionalidades</div>
+    <h2>Todo lo que necesitás. <span class="dim">Nada que no uses.</span></h2>
+    <p class="section-lead">
+      Diseñado desde cero para empresas con facturación recurrente. Sin features para "empresas grandes" que nadie va a usar.
+    </p>
+
+    <div class="features-grid">
+      <div class="feature">
+        <span class="feature-tag">MVP</span>
+        <h3>Motor de facturación recurrente</h3>
+        <p>Scheduler configurable, emisión masiva o individual, reintentos automáticos contra ARCA. A, B, C, E, X, NC y ND.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-tag">MVP</span>
+        <h3>Gestión de clientes</h3>
+        <p>Alta por CUIT/CUIL con autocompletado de razón social, condición frente al IVA, emails y etiquetas.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-tag">MVP</span>
+        <h3>Reglas de precios + simulador</h3>
+        <p>Aumentos por porcentaje, monto fijo o índice. Simulador de impacto antes de aplicar. Frecuencia configurable.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-tag">MVP</span>
+        <h3>Cobranza automática</h3>
+        <p>Secuencias por email, ejecución automática y panel de seguimiento. El equipo deja de perseguir pagos.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-tag">MVP</span>
+        <h3>Conciliación factura-cobro</h3>
+        <p>Cobros manuales, parciales, NC y ND asociadas. Vista facturado vs. cobrado en tiempo real.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-tag">MVP</span>
+        <h3>Roles y permisos</h3>
+        <p>Admin, Operador y Auditor. Control de acceso granular. Exportación contable en PDF.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-tag v2">V2</span>
+        <h3>Conciliación bancaria + MP</h3>
+        <p>Conciliación automática contra extractos bancarios y Mercado Pago. Link de pago y QR interoperable.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-tag v2">V2</span>
+        <h3>Cobranza por WhatsApp</h3>
+        <p>Recordatorios automáticos por el canal donde tus clientes ya están. Plantillas configurables.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-tag v2">V3</span>
+        <h3>Pasarela multi-medio</h3>
+        <p>Débito CBU, tarjeta, transferencia A2A. API pública para integraciones de terceros.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── PERSONAS ─────────── -->
+<section class="personas">
+  <div class="container">
+    <div class="section-eyebrow">Para quién es</div>
+    <h2>Empresas que <span class="accent">cobran abonos.</span></h2>
+    <p class="section-lead">
+      Si tu modelo de ingresos es recurrente, billdr fue diseñado para vos.
+    </p>
+
+    <div class="personas-grid">
+      <div class="persona">
+        <div class="persona-header">
+          <div class="persona-avatar">L</div>
+          <div>
+            <div class="persona-name">Laura M.</div>
+            <div class="persona-meta">Dueña de agencia · CABA · 25 clientes</div>
+          </div>
+        </div>
+        <p class="persona-quote">
+          ARCA cae el primero del mes, conciliar me lleva un día entero, y recalcular aumentos uno por uno me agota antes de empezar.
+        </p>
+        <p class="persona-context">
+          Necesita automatizar emisión y conciliación, alertas de vencimientos, y una forma de actualizar precios sin tocar 25 contratos a mano.
+        </p>
+      </div>
+
+      <div class="persona">
+        <div class="persona-header">
+          <div class="persona-avatar">M</div>
+          <div>
+            <div class="persona-name">Martín K.</div>
+            <div class="persona-meta">Estudio contable · Rosario · 60 clientes pyme</div>
+          </div>
+        </div>
+        <p class="persona-quote">
+          Mi equipo dedica dos días al mes solo a facturar y conciliar cobros. Escalar significa contratar más gente o aceptar el caos.
+        </p>
+        <p class="persona-context">
+          Necesita una sola plataforma con cobranza y conciliación automática, reportes fiscales listos, y permisos granulares por rol.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── PRICING ─────────── -->
+<section id="precios">
+  <div class="container">
+    <div class="section-eyebrow">Planes</div>
+    <h2>Precio claro. <span class="dim">Sin sorpresas.</span></h2>
+    <p class="section-lead">
+      Elegí el plan según tu volumen de facturación. Si crecés, cambiás. Si no, no.
+    </p>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name">Starter</div>
+        <div class="price-desc">Para equipos chicos arrancando con recurrencia.</div>
+        <div class="price-amount">USD 49<span> /mes</span></div>
+        <div class="price-period">Hasta 20 clientes</div>
+        <ul class="price-features">
+          <li>Facturación recurrente automática</li>
+          <li>Integración ARCA con reintentos</li>
+          <li>Conciliación factura-cobro</li>
+          <li>1 usuario</li>
+          <li>Soporte por email</li>
+        </ul>
+        <a href="#contacto" class="price-cta">Empezar</a>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-name">Growth</div>
+        <div class="price-desc">Para empresas con cartera consolidada y equipo.</div>
+        <div class="price-amount">USD 119<span> /mes</span></div>
+        <div class="price-period">Hasta 100 clientes</div>
+        <ul class="price-features">
+          <li>Todo lo de Starter</li>
+          <li>Reglas de aumento + simulador</li>
+          <li>Cobranza automática por email</li>
+          <li>Hasta 5 usuarios con roles</li>
+          <li>Soporte prioritario</li>
+        </ul>
+        <a href="#contacto" class="price-cta">Empezar</a>
+      </div>
+
+      <div class="price-card">
+        <div class="price-name">Pro</div>
+        <div class="price-desc">Para estudios y empresas con alto volumen.</div>
+        <div class="price-amount">USD 249<span> /mes</span></div>
+        <div class="price-period">Clientes ilimitados</div>
+        <ul class="price-features">
+          <li>Todo lo de Growth</li>
+          <li>Usuarios ilimitados</li>
+          <li>Exportación contable avanzada</li>
+          <li>Onboarding asistido incluido</li>
+          <li>SLA y soporte dedicado</li>
+        </ul>
+        <a href="#contacto" class="price-cta">Hablar con ventas</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── CTA FINAL ─────────── -->
+<section class="cta-final" id="contacto">
+  <div class="container">
+    <h2>Configurá una vez.<br><span class="accent">Cobrá siempre.</span></h2>
+    <p>
+      Sumate a la lista de espera. Te avisamos apenas estemos listos para sumarte como early adopter.
+    </p>
+    <div class="cta-final-actions">
+      <a href="#" class="btn-primary">Sumarme a la lista →</a>
+      <a href="#" class="btn-secondary">Hablar con el equipo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── FOOTER ─────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo">billdr</span>
+        <p>Infraestructura de cobro para empresas de servicios en Argentina. Facturación recurrente, conciliación y cobro en una sola plataforma.</p>
+      </div>
+      <div class="footer-col">
+        <h6>Producto</h6>
+        <a href="#">Funcionalidades</a>
+        <a href="#">Precios</a>
+        <a href="#">Roadmap</a>
+        <a href="#">Changelog</a>
+      </div>
+      <div class="footer-col">
+        <h6>Recursos</h6>
+        <a href="#">Documentación</a>
+        <a href="#">Guía ARCA</a>
+        <a href="#">Casos de éxito</a>
+        <a href="#">Blog</a>
+      </div>
+      <div class="footer-col">
+        <h6>Empresa</h6>
+        <a href="#">Sobre nosotros</a>
+        <a href="#">Contacto</a>
+        <a href="#">Términos</a>
+        <a href="#">Privacidad</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 billdr · Buenos Aires, Argentina</div>
+      <div>hola@billdr.ar</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.problem-card, .flow-card, .feature, .persona, .price-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = `opacity 0.6s ease-out ${i * 0.05}s, transform 0.6s ease-out ${i * 0.05}s`;
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
